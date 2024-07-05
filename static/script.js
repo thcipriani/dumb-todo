@@ -2,7 +2,8 @@
 const todos = document.querySelector('.todos'),
       dones = document.querySelector('.done'),
       errors = document.querySelector('.error'),
-      messages = document.querySelector('.messages');
+      messages = document.querySelector('.messages')
+      addTodo = document.querySelector('.add-todo'),
 
 function error() {
     errors.innerHTML = 'An error occurred. Please try again later.';
@@ -84,5 +85,40 @@ function getTodos() {
         console.error(error);
     });
 };
+
+addTodo.addEventListener('submit', event => {
+    event.preventDefault();
+    let todo = event.target.querySelector('input').value;
+    let body = event.target.querySelector('textarea').value;
+    if (todo === '') {
+        errors.innerHTML = 'Please enter a todo.';
+        setTimeout(() => {
+            errors.innerHTML = '';
+        }, 3000);
+        return;
+    }
+    fetch('/new', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            todo: todo,
+            body: body
+        }),
+    }).then(response => {
+        if (!response.ok) {
+            error();
+        } else {
+            messages.innerHTML = 'Todo added successfully.';
+            setTimeout(() => {
+                getTodos();
+            }, 3000);
+            getTodos();
+        }
+    }).catch(error => {
+        error();
+    });
+});
 
 getTodos();

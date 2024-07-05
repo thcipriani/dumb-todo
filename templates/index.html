@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
   <body>
+      <form class="add-todo">
+        <input type="text" name="todo" placeholder="Add a new todo" required>
+        <textarea name="body" placeholder="Add a description"></textarea>
+        <button type="submit">Add</button>
+    </form>
     <h2>📌 TODOS</h2>
     <div class="todos">
     </div>
