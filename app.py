@@ -4,6 +4,7 @@ import argparse
 import glob
 import json
 import os
+import datetime
 
 from flask import Flask, request, jsonify, render_template
 
@@ -13,6 +14,31 @@ CONFIG = {
 }
 
 app = Flask(__name__)
+
+def cleanBody(body):
+    """
+    Only allow alphanumeric characters, spaces, and newlines
+    """
+    return ''.join([c for c in body if c.isalnum() or c.isspace() or c == '\n'])
+
+def cleanFilePath(path):
+    """
+    Only allow alphanumeric characters, periods, and underscores
+    """
+    path.replace(' ', '-')
+    date = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d')
+    path = ''.join([c for c in path if c.isalnum() or c == '.' or c == '_']).lower()
+    return f'{date}-{path}'
+
+@app.route('/new', methods=['POST'])
+def new_todo(request=request):
+    print(request.json)
+    todo_path = CONFIG['todo_dir']
+    todo = cleanFilePath(request.json['todo'].strip())
+    body = cleanBody(request.json['body'].strip())
+    with open(f'{todo_path}/{todo}', 'w') as f:
+        f.write(cleanBody(body))
+    return jsonify({'status': 'ok'})
 
 @app.route('/api', methods=['GET'])
 def api_get():
